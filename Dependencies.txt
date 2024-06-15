@@ -1,0 +1,4 @@
+fftw: https://github.com/FFTW/fftw3
+SFML-2.6.1 Audio: https://github.com/SFML/SFML
+
+AudioFile: https://github.com/adamstark/AudioFile
