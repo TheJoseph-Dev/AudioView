@@ -1,0 +1,10 @@
+#include <iostream>
+#include <windows.h>
+#pragma comment(lib, "Winmm.lib")
+
+#define Resources(path) "Project/Resources/" path
+
+int main() {
+	PlaySound(TEXT(Resources("Samples/Japan.wav")), NULL, SND_ASYNC);
+	system("pause");
+}
