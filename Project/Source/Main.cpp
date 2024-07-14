@@ -65,7 +65,7 @@ int main() {
 
 	sf::Music music;
 	AudioFile<double> af;
-	std::string song = "In-My-Life.wav";//"In-My-Life-MA.wav";
+	std::string song = "japan.wav";//"In-My-Life-MA.wav";
 	
 	af.load(Resources("Samples/" + song));
 	af.printSummary();
@@ -141,7 +141,7 @@ int main() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * stride, (void*)(sizeof(float) * 3));
 
 
-	Shader shader = Shader(Resources("Shaders/textureQuad.glsl"));
+	Shader shader = Shader(Resources("Shaders/audioView.glsl"));
 	shader.Bind();
 
 	glm::mat4 mvp = glm::mat4(1.0f);
@@ -171,6 +171,10 @@ int main() {
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	Texture bgTexture = Texture(Resources("Textures/Himalaias.jpg"));
+	bgTexture.Bind();
+	bgTexture.Load();
 
 	system(" ");
 	
@@ -203,8 +207,14 @@ int main() {
 
 		//for (int i = 0; i < nSamples; i++) lastFFT[i] = musicFFT.getResultF()[i];
 		musicFFT.Execute( FFT_BM_WINDOW | FFT_ABS | FFT_SMOOTH | FFT_CONVERT_TO_DB  );
-		for (int i = 0; i < nSamples; i++) lastFFT[i] = lerp(lastFFT[i], musicFFT.getResultF()[i], 0.1f);
-		
+
+		float maxFreq = 0.0;
+		for (int i = 0; i < nSamples; i++) {
+			lastFFT[i] = lerp(lastFFT[i], musicFFT.getResultF()[i], 0.1f);
+			maxFreq = std::max(maxFreq, lastFFT[i]);
+		}
+
+		//print(maxSample);
 		fb.Bind();
 		//glEnable(GL_DEPTH_TEST);
 
@@ -220,8 +230,12 @@ int main() {
 		//shader.SetUniformFloat("iTime", time);
 		//shader.SetUniformInt("nSamples", nSamples);
 		
-		shader.SetUniformInt("tex", 0);
+		shader.SetUniformInt("audioFreqsTex", 0);
+		bgTexture.Bind();
+		shader.SetUniformInt("bgImage", 0);
 		shader.SetUniform2f("iResolution", WINDOW_WIDTH, WINDOW_HEIGHT);
+		shader.SetUniformFloat("iTime", time);
+		shader.SetUniformFloat("maxFreq", maxFreq);
 
 		// Index buffer
 		/*
